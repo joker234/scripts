@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+share=$(xclip -o |  sed 's/\s*$//g')
+qrencode -s 7 -o - "$share" | display -title "$share share-qrcode-float" -

@@ -1,0 +1,49 @@
+#!/usr/bin/env zsh
+
+sharefolder=http-joker234.de/share
+sshhost=vi
+urlbase=https://joker234.de/share
+
+function usage {
+	echo "Usage: share [-c] [-h] file ..." >&2
+	exit $1
+}
+
+while getopts ':ch' OPTION ; do
+	case $OPTION in
+		c) CLIPBOARD=true
+		;;
+		h) usage 0
+		;;
+		?) usage 1
+		;;
+	esac
+done
+shift $(( $OPTIND - 1 ))
+
+if [[ $1 == "" ]]; then
+	usage 1
+else
+	
+	HASH=$(date | md5sum | head -c8)
+	ssh $sshhost mkdir $sharefolder/$HASH
+	if rsync -hr --progress --chmod=o+r $@ $sshhost:$sharefolder/$HASH; then
+		for i in $*; do
+			I=`basename $i`
+			I=$(echo $I | sed 's/ /%20/g')
+			echo "$urlbase/$HASH/$I"
+		done
+		if [[ $i != $* ]]; then
+			if ($CLIPBOARD); then
+				echo "$urlbase/$HASH/" | xclip -i
+				echo "$urlbase/$HASH/"
+			else
+				echo "$urlbase/$HASH/"
+			fi
+		fi
+	else
+		echo "Upload failed" >&2
+		exit 1
+	fi
+	ssh $sshhost "echo '<html><body>&nbsp;</body></html>' > $sharefolder/index.html"
+fi

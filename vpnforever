@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+
+while true; do
+	if [[ `iwconfig wlan0 | grep ESSID` =~ "UNI-HEIDELBERG" ]]; then
+		if ! ping -c 1 -W 1 heise.de >/dev/null 2>&1; then
+			killall vpnc >/dev/null 2>&1
+			vpnc unihd.conf >/dev/null 2>&1
+		else
+			sleep 5s
+		fi
+	fi
+	if [[ ! `ps -aux | grep root | grep wpa_supplicant` =~ "wpa_supplicant.unihd.conf" ]]; then
+		sudo vpnc-disconnect
+		exit
+	fi
+done

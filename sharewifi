@@ -1,0 +1,27 @@
+#!/usr/bin/env zsh
+
+interface="wlan0"
+ssid=`iwconfig $interface | grep ESSID | sed 's/.*ESSID:"\(.*\)".*/\1/'`
+config=`ps -aux | grep wpa_supplicant | grep root | grep -v grep | sed 's/.*-c\([\/a-zA-Z0-9_-\.]*\)\b.*/\1/'`
+
+network=`cat $config | tr "\\n" ";" | sed "s/.*\(network={[^}]*${ssid}[^}]*}\).*/\1/"`
+key_mgmt=`echo $network | sed "s/.*key_mgmt=[\"]\?\([^;]*\)[;\"].*/\1/"`
+password=`echo $network | sed "s/.*\#psk=[\"]\?\([^\";]*\)[;\"].*/\1/"`
+
+case $key_mgmt in 
+	NONE)
+	t=""
+	;;
+
+	*)
+	t="WPA"
+	;;
+esac
+
+if echo $password | grep psk ; then
+	password=""
+fi
+
+share="WIFI:T:${t};S:"${ssid}";P:${password};;"
+echo $share
+qrencode -s 7 -o - "$share" | display -title "$share share-qrcode-float" -

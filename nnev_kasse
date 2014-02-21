@@ -1,0 +1,59 @@
+#!/usr/bin/env zsh
+
+STORE=${HOME}/nnev/schulden_kasse
+DRINK=1
+DEFAULT=1
+NOTIFY_TIME=1000 # notification time in ms. 0 disables notification
+
+CURRENT=$(cat $STORE)
+NEW_VAL=$CURRENT
+
+function value {
+	if [ "$1" = "" ]; then
+		echo "using default value: $DEFAULT"
+		VAL=$DEFAULT
+	else
+		VAL=$1
+	fi
+}
+
+case $1 in
+	i|increment)
+	value $2
+	NEW_VAL=$(echo "$CURRENT+$VAL" | bc)
+	echo "increment $CURRENT by $VAL to $NEW_VAL"
+	;;
+
+	d|decrement)
+	value $2
+	NEW_VAL=$(echo "$CURRENT-$VAL" | bc)
+	echo "decrement $CURRENT by $VAL to $NEW_VAL"
+	;;
+
+	dr|drink)
+	NEW_VAL=$(echo "$CURRENT-$DRINK" | bc)
+	echo "decrement $CURRENT by $DRINK (drink price) to $NEW_VAL"
+	;;
+
+	s|set)
+	value $2
+	NEW_VAL=$VAL
+	echo "set $CURRENT to $VAL"
+	;;
+
+	sh|show)
+	echo "$CURRENT"
+	;;
+
+	*)
+	echo "Usage: nnev_kasse <command> [<value>]"
+	echo "    i[ncrement]  increment by given value (default: $DEFAULT)"
+	echo "    d[ecrement]  decrement by given value (default: $DEFAULT)"
+	echo "    dr[ink]      decrement by drink price ($DRINK)"
+	echo "    s[et]        set to given value"
+	echo "    sh[ow]       shows the current stored value"
+	exit 1
+esac
+
+echo "$NEW_VAL" > $STORE
+notify-send "Aktueller Kassenstand: $(cat $STORE) €" -t $NOTIFY_TIME

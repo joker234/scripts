@@ -1,0 +1,2 @@
+#!/usr/bin/zsh
+yaourt -Qi | grep "^Installed Size\|^Name" | sed 's/^.*: *\(.*\)$/\1/' | sed 'N;s/\(.*\)\n\(.*\)/\2: \1/g' | sort -h
