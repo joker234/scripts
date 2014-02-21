@@ -5,7 +5,7 @@ DRINK=1
 DEFAULT=1
 NOTIFY_TIME=1000 # notification time in ms. 0 disables notification
 
-CURRENT=$(cat $STORE)
+CURRENT=$(tail -n1 $STORE)
 NEW_VAL=$CURRENT
 
 function value {
@@ -55,5 +55,7 @@ case $1 in
 	exit 1
 esac
 
-echo "$NEW_VAL" > $STORE
-notify-send "Aktueller Kassenstand: $(cat $STORE) €" -t $NOTIFY_TIME
+if [ "$CURRENT" != "$NEW_VAL" ]; then 
+	echo "$NEW_VAL" >> $STORE
+fi
+notify-send "Aktueller Kassenstand: $(tail -n1 $STORE) €" -t $NOTIFY_TIME
