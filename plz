@@ -5,4 +5,4 @@ stadt=$(echo $1 | sed 's/ /%20/g')
 strasse=$(echo $2 | sed 's/ /%20/g')
 hausnummer=$(echo $3 | sed 's/ //g')
 
-curl "https://classic.klicktel.de/postleitzahlen/index/search?method=searchSimple&city_id=&_dvform_posted=1&zipCity=${stadt}&street=${strasse}&streetNumber=${hausnummer}" --insecure -s | grep "\"poboxcodelist\"" -A16 | grep "<td>[0-9]\{5\}<\/td>" | sed 's/.*\([0-9]\{5\}\).*/\1/g'
+curl "https://classic.klicktel.de/postleitzahlen/index/search?method=searchSimple&city_id=&_dvform_posted=1&zipCity=${stadt}&street=${strasse}&streetNumber=${hausnummer}" --insecure -s | grep "\"poboxcodelist\"" -A16 | grep "<td>[0-9.]\{5\}<\/td>" | sed 's/.*\([0-9.]\{5\}\).*/\1/g'
