@@ -21,7 +21,7 @@ case $choice in
 
 	2*)
 	echo "us (international)"
-	setxkbmad us intl
+	setxkbmap us intl
 	;;
 
 	*)
