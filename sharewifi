@@ -2,7 +2,7 @@
 
 interface="wlan0"
 ssid=`iwconfig $interface | grep ESSID | sed 's/.*ESSID:"\(.*\)".*/\1/'`
-config=`ps -aux | grep wpa_supplicant | grep root | grep -v grep | sed 's/.*-c\([\/a-zA-Z0-9_-\.]*\)\b.*/\1/'`
+config=`ps -aux | grep wpa_supplicant | grep root | grep -v grep | sed 's/.*-c\([\/a-zA-Z0-9_-\.]*\).*/\1/'`
 
 network=`cat $config | tr "\\n" ";" | sed "s/.*\(network={[^}]*${ssid}[^}]*}\).*/\1/"`
 key_mgmt=`echo $network | sed "s/.*key_mgmt=[\"]\?\([^;]*\)[;\"].*/\1/"`
