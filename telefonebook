@@ -1,0 +1,30 @@
+#!/usr/bin/env zsh
+# BETA
+
+function usage {
+	echo "Usage: telefonebook [-h] Name [Town]" >&2
+	exit $1
+}
+
+while getopts ':h?' OPTION ; do
+	case $OPTION in
+		h) usage 0
+		;;
+		?) usage 1
+		;;
+	esac
+done
+shift $(( $OPTIND - 1 ))
+
+if [[ $1 == "" ]]; then
+	usage 1
+else
+	name=$(echo $1 | sed 's/ /%20/g')
+	stadt=$(echo $2 | sed 's/ /%20/g')
+
+	curl "http://www3.dastelefonbuch.de/?kw=${name}&ort=${stadt}&cmd=search" -sL | grep "<a id=\"name\|<address\|<span class=\"ico fon" -A1 | grep -v "<a id=\"name\|<address\|^--\|gratis" | sed "s/<span class=\"ico fon\">Fon<\/span>//g" | sed "s/<span[^>]*>\|<\/span>//g" | sed "s/^[^A-Za-z0-9]*\(.*\)<\/a>/\1/" | sed "s/^[^A-Za-z0-9]\+\([A-Za-z0-9].*\)/  \1/" | sed "s/<\/address>\|<br\/>//g" | sed "s/&nbsp;/ /g" | sed "s/&auml;/ä/g" | sed "s/&ouml;/ö/g" | sed "s/&uuml;/ü/g" | sed "s/&Auml;/Ä/g" | sed "s/&Ouml;/Ö/g" | sed "s/&Uuml;/Ü/g" | sed "s/&szlig;/ß/g" | sed "s/&amp;/\&/g" | sed "s/&quot;/\"/g"
+	# Ringstr. 39,  69115 Heidelberg, Weststadt</address>
+	# </address>
+fi
+
+
