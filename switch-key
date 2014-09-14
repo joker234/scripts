@@ -10,12 +10,12 @@ fi
 case $choice in
 	0*)
 	echo "display-switch"
-	display-switch
+	${HOME}/bin/display-switch
 	;;
 
 	1*)
 	echo "keyboard-layout"
-	keyboard-layout
+	${HOME}/bin/keyboard-layout
 	;;
 
 	*)
