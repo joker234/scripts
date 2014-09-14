@@ -31,6 +31,7 @@ else
 		for i in $*; do
 			I=`basename $i`
 			I=$(echo $I | sed 's/ /%20/g')
+			I=$(echo $I | sed 's/://g')
 			echo "$urlbase/$HASH/$I"
 		done
 		if [[ $i != $* ]]; then
