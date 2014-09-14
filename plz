@@ -1,8 +1,27 @@
 #!/usr/bin/env zsh
 # BETA
 
-stadt=$(echo $1 | sed 's/ /%20/g')
-strasse=$(echo $2 | sed 's/ /%20/g')
-hausnummer=$(echo $3 | sed 's/ //g')
+function usage {
+	echo "Usage: plz [-h] Town [Street [Housenumber]]" >&2
+	exit $1
+}
 
-curl "http://www.postleitzahlen.de/postleitzahlen/index/search?method=searchSimple&city_id=&_dvform_posted=1&zipCity=${stadt}&street=${strasse}&streetNumber=${hausnummer}" -s | grep "\"poboxcodelist\"" -A16 | grep "<td>[0-9.]\{5\}<\/td>" | sed 's/.*\([0-9.]\{5\}\).*/\1/g'
+while getopts ':h?' OPTION ; do
+	case $OPTION in
+		h) usage 0
+		;;
+		?) usage 1
+		;;
+	esac
+done
+shift $(( $OPTIND - 1 ))
+
+if [[ $1 == "" ]]; then
+	usage 1
+else
+	stadt=$(echo $1 | sed 's/ /%20/g')
+	strasse=$(echo $2 | sed 's/ /%20/g')
+	hausnummer=$(echo $3 | sed 's/ //g')
+
+	curl "http://www.postleitzahlen.de/postleitzahlen/index/search?method=searchSimple&city_id=&_dvform_posted=1&zipCity=${stadt}&street=${strasse}&streetNumber=${hausnummer}" -s | grep "\"poboxcodelist\"" -A16 | grep "<td>[0-9.]\{5\}<\/td>" | sed 's/.*\([0-9.]\{5\}\).*/\1/g'
+fi
