@@ -1,16 +1,19 @@
 #!/usr/bin/env zsh
 
 function usage {
-	echo "Usage: addr [-4] [-6] [-h] [ dev ]" >&2
+	echo "Usage: addr [-4] [-6] [-n] [-h] [ dev ]" >&2
 	exit $1
 }
 
 grepterm='^[0-9]\|inet'
-while getopts ':46h' OPTION ; do
+ipterm='[0-9a-z:.]'
+while getopts ':46nh' OPTION ; do
 	case $OPTION in
 		4) grepterm='^[0-9]\|inet[^6]'
 		;;
 		6) grepterm='^[0-9]\|inet6'
+		;;
+		n) ipterm='[0-9a-z:.\/]'
 		;;
 		h) usage 1
 		;;
@@ -19,7 +22,7 @@ done
 shift $(( $OPTIND - 1 ))
 
 if [ "$1" = "" ]; then
-	ip a | grep -e "$grepterm" | sed -e 's/.*inet[6]\? \([0-9a-z:.]*\).*/	\1/g' -e 's/[0-9]*: \(.*\):.*/\1:/g'
+	ip a | grep -e "$grepterm" | sed -e "s/.*inet[6]\? \($ipterm*\).*/	\1/g" -e "s/[0-9]*: \(.*\):.*/\1:/g"
 else
-	ip a s dev $1 | grep -e "$grepterm" | grep -e "inet" | sed -e 's/.*inet[6]\? \([0-9a-z:.]*\).*/\1/g'
+	ip a s dev $1 | grep -e "$grepterm" | grep -e "inet" | sed -e "s/.*inet[6]\? \($ipterm*\).*/\1/g"
 fi
